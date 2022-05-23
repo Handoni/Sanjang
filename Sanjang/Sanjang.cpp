@@ -4,9 +4,9 @@
 #include <bangtal.h>
 #include <stdio.h>
 
-SceneID scene_start;
+SceneID scene_main, scene_start;
 TimerID timer_start;
-ObjectID object_start;
+ObjectID object_start, object_textbox;
 
 int start_cnt=1;
 ObjectID createObject(const char* image, SceneID scene, int x, int y, bool shown=true);
@@ -14,6 +14,8 @@ const char* countName(int num);
 void mouseCallback(ObjectID object, int x, int y, MouseAction action);
 void timerCallback(TimerID timer);
 void keyboardCallback(KeyCode keycode, KeyState keystate);
+void mainSetup();
+void startSetup();
 
 int main()
 {
@@ -25,12 +27,16 @@ int main()
 	setTimerCallback(timerCallback);
 	setKeyboardCallback(keyboardCallback);
 
-	scene_start = createScene("시작");
+	object_textbox = createObject("resources/common/textbox.png");
 
-	object_start = createObject("resources/startscene/1.png", scene_start, 300, 300, false);
+	scene_start = createScene("Start");
 
+	object_start = createObject("resources/scene_start/1.png", scene_start, 300, 300, false);
 
-	startGame(scene_start);
+	mainSetup();
+
+	startGame(scene_main);
+	
 }
 
 void mouseCallback(ObjectID object, int x, int y, MouseAction action)
@@ -69,7 +75,7 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 const char* countName(int num)
 {
 	static char buff[50];
-	sprintf_s(buff, sizeof(buff), "resources/startscene/%d.png", num);
+	sprintf_s(buff, sizeof(buff), "resources/scene_start/%d.png", num);
 	return buff;
 }
 
@@ -83,4 +89,10 @@ ObjectID createObject(const char* image, SceneID scene, int x, int y, bool shown
 		showObject(object);
 	}
 	return object;
+}
+
+void mainSetup()
+{
+	scene_main = createScene("Main", "resources/scene_main/background.jpg");
+	locateObject(object_textbox, scene_main, 200, 100);
 }
