@@ -4,25 +4,28 @@
 #include <bangtal.h>
 #include <stdio.h>
 
-#define LINE(n) 200-80*(n-1)
+#define LINE(n) 200-60*(n-1)
 
-SceneID scene_main, scene_start, scene_1;
+SceneID scene_main, scene_start, scene[50];
 SceneID* scene_now;
 TimerID timer_start, timer_fadein;
 ObjectID object_arrow, object_start, object_textbox;
 ObjectID text[5];
 SoundID sound_rain;
 
-int cnt=1, line_num, line_now;
+int cnt=1, line_num[5], line_now, script_num, script_now=1;
+bool wating=false;
 ObjectID createObject(const char* image, SceneID scene, int x, int y, bool shown=true);
 const char* countName(int num);
+const char* scriptName(const char* scene_name, int num, int line);
 void setObject(ObjectID object, const char* image, SceneID scene, int x, int y);
-int main();
 void mouseCallback(ObjectID object, int x, int y, MouseAction action);
 void timerCallback(TimerID timer);
 void keyboardCallback(KeyCode keycode, KeyState keystate);
+void scriptSetup(const char* scene_name, SceneID scene, int num, int line_num);
 void mainSetup();
 void startSetup();
+void sceneSetup(int n);
 
 int main()
 {
@@ -66,10 +69,10 @@ void timerCallback(TimerID timer)
 		else if (cnt == 14)
 		{
 			hideObject(object_start);
-			scene_1 = createScene("1", "resources/scene_1/background.jpg");
-			enterScene(scene_1);
-			setSceneLight(scene_1, 0);
-			scene_now = &scene_1;
+			scene[1] = createScene("1", "resources/scene_1/background.jpg");
+			enterScene(scene[1]);
+			setSceneLight(scene[1], 0);
+			scene_now = &scene[1];
 
 			cnt = 1;
 			timer_fadein = createTimer(0.2f);
@@ -80,28 +83,66 @@ void timerCallback(TimerID timer)
 	{
 		if (cnt < 10)
 		{
-			setSceneLight(scene_1, cnt*0.1);
+			setSceneLight(*scene_now, cnt*0.1);
 			cnt++;
 			setTimer(timer_fadein, 0.2f);
 			startTimer(timer_fadein);
 		}
 		else if (cnt == 10)
 		{
-			setSceneLight(scene_1, 1.0f);
-			locateObject(object_textbox, *scene_now, 0, 0);
-			showObject(object_textbox);
-			setObject(text[0], "resources/scene_1/text1_line1.png", scene_1, 100, LINE(1));
-			setObject(text[1], "resources/scene_1/text1_line2.png", scene_1, 100, LINE(2));
-			locateObject(object_arrow, scene_1, 1230, 20);
+			if(scene_now == &scene[1])
+				sceneSetup(1);
+			if (scene_now == &scene[2])
+			{
+				setSceneLight(scene[2], 1.f);
+				locateObject(object_textbox, scene[2], 0, 0);
+				showObject(object_textbox);
+			}
 		}
 	}
 }
 
 void keyboardCallback(KeyCode keycode, KeyState keystate)
 {
-	if (scene_now == &scene_main)
+	if (keycode == KeyCode::KEY_ENTER && keystate == KeyState::KEY_PRESSED)
 	{
-		if (keycode == KeyCode::KEY_UP_ARROW && keystate == KeyState::KEY_PRESSED)
+		if (scene_now == &scene_main)
+		{
+			if (line_now == 1)
+			{
+				startSetup();
+				enterScene(scene_start);
+				scene_now = &scene_start;
+				showObject(object_start);
+				playSound(sound_rain, true);
+				cnt = 1;
+				timer_start = createTimer(1.0f);
+				startTimer(timer_start);
+			}
+		}
+		for (int i = 1;i<10; i++)
+		{
+			if (scene_now == &scene[i])
+			{
+				if (script_now < script_num)
+				{
+					char buff[20];
+					sprintf_s(buff, sizeof(buff), "scene_%d", i);
+					script_now++;
+					scriptSetup(buff, scene[1], script_now, line_num[script_now]);
+				}
+				else if (script_now == 3)
+				{
+					sceneSetup(i+1);
+				}
+				break;
+			}
+		}
+	}
+
+	if (keycode == KeyCode::KEY_UP_ARROW && keystate == KeyState::KEY_PRESSED)
+	{
+		if (scene_now == &scene_main)
 		{
 			if (line_now != 1)
 			{
@@ -109,34 +150,32 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				locateObject(object_arrow, scene_main, 50, LINE(line_now) + 25);
 			}
 		}
-		if (keycode == KeyCode::KEY_DOWN_ARROW && keystate == KeyState::KEY_PRESSED)
+	}
+	if (keycode == KeyCode::KEY_DOWN_ARROW && keystate == KeyState::KEY_PRESSED)
+	{
+		if (scene_now == &scene_main)
 		{
-			if (line_now != line_num)
+			if (line_now != line_num[script_now])
 			{
 				line_now++;
 				locateObject(object_arrow, scene_main, 50, LINE(line_now) + 25);
 
 			}
 		}
-		if (keycode == KeyCode::KEY_ENTER && line_now == 1)
-		{
-			startSetup();
-			enterScene(scene_start);
-			scene_now = &scene_start;
-			showObject(object_start);
-			playSound(sound_rain, true);
-			cnt = 1;
-			timer_start = createTimer(1.0f);
-			startTimer(timer_start);
-		}
 	}
-	
 }
 
 const char* countName(int num)
 {
 	static char buff[50];
 	sprintf_s(buff, sizeof(buff), "resources/scene_start/%d.png", num);
+	return buff;
+}
+
+const char* scriptName(const char* scene_name, int num, int line)
+{
+	static char buff[100];
+	sprintf_s(buff, sizeof(buff), "resources/%s/text%d_line%d.png", scene_name, num, line);
 	return buff;
 }
 
@@ -160,6 +199,14 @@ ObjectID createObject(const char* image, SceneID scene, int x, int y, bool shown
 	return object;
 }
 
+void scriptSetup(const char* scene_name, SceneID scene, int num, int line_num)
+{
+	for (int i = 1; i <= line_num; i++)
+	{
+		setObject(text[i], scriptName(scene_name, num, i), scene, 100, LINE(i));
+	}
+}
+
 void mainSetup()
 {
 	scene_now = &scene_main;
@@ -167,9 +214,10 @@ void mainSetup()
 	locateObject(object_textbox, scene_main, 0, 0);
 	showObject(object_textbox);
 	
-	line_num = 2;
-	setObject(text[0], "resources/scene_main/text1_line1.png", scene_main, 100, LINE(1));
-	setObject(text[1], "resources/scene_main/text1_line2.png", scene_main, 100, LINE(2));
+	script_num = 1;
+	script_now = 1;
+	line_num[1] = 2;
+	scriptSetup("scene_main", scene_main, script_now, line_num[script_now]);
 
 	line_now = 1;
 	locateObject(object_arrow, scene_main, 50, LINE(line_now)+25);
@@ -183,4 +231,44 @@ void startSetup()
 	scene_start = createScene("Start");
 	object_start = createObject("resources/scene_start/0.png", scene_start, 420, 300, false);
 	sound_rain = createSound("resources/scene_start/rainsound.mp3");
+}
+
+void sceneSetup(int n)
+{
+	switch (n)
+	{
+	case 1:
+		setSceneLight(scene[1], 1.0f);
+		locateObject(object_textbox, *scene_now, 0, 0);
+		showObject(object_textbox);
+		script_num = 3;
+		script_now = 1;
+		line_num[1] = 3;
+		line_num[2] = 4;
+		line_num[3] = 4;
+		scriptSetup("scene_1", scene[1], script_now, line_num[script_now]);
+		locateObject(object_arrow, scene[1], 1230, 20);
+		break;
+	case 2:
+		scene[2] = createScene("2", "resources/scene_2/background.jpg");
+		setSceneLight(scene[2], 0);
+		enterScene(scene[2]);
+		scene_now = &scene[2];
+		
+		script_num = 5;
+		script_now = 1;
+		
+		line_num[1] = 3;
+		line_num[2] = 3;
+		line_num[3] = 2;
+		line_num[4] = 2;
+		line_num[5] = 3;
+		cnt = 1;
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
+
+		break;
+	default:
+		break;
+	}
 }
