@@ -11,10 +11,11 @@ SceneID* scene_now;
 TimerID timer_start, timer_fadein;
 ObjectID object_arrow, object_start, object_textbox;
 ObjectID text[5];
+ObjectID char_madongsuk;
 SoundID sound_rain;
 
-int cnt=1, line_num[5], line_now, script_num, script_now=1;
-bool wating=false;
+int cnt=1, line_num[15], line_now, script_num, script_now=1;
+bool on_wait = false;
 ObjectID createObject(const char* image, SceneID scene, int x, int y, bool shown=true);
 const char* countName(int num);
 const char* scriptName(const char* scene_name, int num, int line);
@@ -90,13 +91,20 @@ void timerCallback(TimerID timer)
 		}
 		else if (cnt == 10)
 		{
-			if(scene_now == &scene[1])
+			if (scene_now == &scene[1])
+			{
 				sceneSetup(1);
+				
+			}
 			if (scene_now == &scene[2])
 			{
 				setSceneLight(scene[2], 1.f);
 				locateObject(object_textbox, scene[2], 0, 0);
+				locateObject(object_arrow, scene[2], 1230, 20);
 				showObject(object_textbox);
+				showObject(char_madongsuk);
+				script_now = 1;
+				scriptSetup("scene_2", scene[2], script_now, line_num[script_now]);
 			}
 		}
 	}
@@ -104,12 +112,13 @@ void timerCallback(TimerID timer)
 
 void keyboardCallback(KeyCode keycode, KeyState keystate)
 {
-	if (keycode == KeyCode::KEY_ENTER && keystate == KeyState::KEY_PRESSED)
+	if (keycode == KeyCode::KEY_ENTER && keystate == KeyState::KEY_PRESSED && on_wait)
 	{
 		if (scene_now == &scene_main)
 		{
 			if (line_now == 1)
 			{
+				on_wait = false;
 				startSetup();
 				enterScene(scene_start);
 				scene_now = &scene_start;
@@ -129,10 +138,11 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 					char buff[20];
 					sprintf_s(buff, sizeof(buff), "scene_%d", i);
 					script_now++;
-					scriptSetup(buff, scene[1], script_now, line_num[script_now]);
+					scriptSetup(buff, scene[i], script_now, line_num[script_now]);
 				}
-				else if (script_now == 3)
+				else if (script_now == script_num)
 				{
+					on_wait = false;
 					sceneSetup(i+1);
 				}
 				break;
@@ -205,6 +215,7 @@ void scriptSetup(const char* scene_name, SceneID scene, int num, int line_num)
 	{
 		setObject(text[i], scriptName(scene_name, num, i), scene, 100, LINE(i));
 	}
+	on_wait = true;
 }
 
 void mainSetup()
@@ -247,6 +258,7 @@ void sceneSetup(int n)
 		line_num[2] = 4;
 		line_num[3] = 4;
 		scriptSetup("scene_1", scene[1], script_now, line_num[script_now]);
+		on_wait = true;
 		locateObject(object_arrow, scene[1], 1230, 20);
 		break;
 	case 2:
@@ -260,13 +272,33 @@ void sceneSetup(int n)
 		
 		line_num[1] = 3;
 		line_num[2] = 3;
-		line_num[3] = 2;
-		line_num[4] = 2;
-		line_num[5] = 3;
+		line_num[3] = 3;
+		line_num[4] = 3;
+		line_num[5] = 4;
 		cnt = 1;
+
+		char_madongsuk = createObject("resources/common/char_madongsuk.png", scene[2], 100, 300, false);
 		setTimer(timer_fadein, 0.2f);
 		startTimer(timer_fadein);
 
+		break;
+	case 3:
+		scene[3] = createScene("3", "resources/scene_3/background.jpg");
+		setSceneLight(scene[3], 0);
+		enterScene(scene[3]);
+		scene_now = &scene[3];
+
+		script_num = 15;
+		script_now = 1;
+
+		line_num[1] = 3; line_num[2] = 3; line_num[3] = 3; line_num[4] = 3; line_num[5] = 4;
+		line_num[6] = 3; line_num[7] = 3; line_num[8] = 3; line_num[9] = 3; line_num[10] = 4;
+		line_num[11] = 3; line_num[12] = 3; line_num[13] = 3; line_num[14] = 3; line_num[15] = 4;
+
+		cnt = 1;
+
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
 		break;
 	default:
 		break;
