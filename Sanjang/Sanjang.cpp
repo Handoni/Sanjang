@@ -14,7 +14,7 @@ ObjectID text[5];
 ObjectID char_madongsuk;
 SoundID sound_rain;
 
-int cnt=1, line_num[15], line_now, script_num, script_now=1;
+int cnt=1, line_num[65], line_now, script_num, script_now=1;
 bool on_wait = false;
 ObjectID createObject(const char* image, SceneID scene, int x, int y, bool shown=true);
 const char* countName(int num);
@@ -84,7 +84,7 @@ void timerCallback(TimerID timer)
 	{
 		if (cnt < 10)
 		{
-			setSceneLight(*scene_now, cnt*0.1);
+			setSceneLight(*scene_now, cnt*0.1f);
 			cnt++;
 			setTimer(timer_fadein, 0.2f);
 			startTimer(timer_fadein);
@@ -105,6 +105,16 @@ void timerCallback(TimerID timer)
 				showObject(char_madongsuk);
 				script_now = 1;
 				scriptSetup("scene_2", scene[2], script_now, line_num[script_now]);
+			}
+			if (scene_now == &scene[3])
+			{
+				setSceneLight(scene[3], 1.f);
+				locateObject(object_textbox, scene[3], 0, 0);
+				locateObject(object_arrow, scene[3], 1230, 20);
+				showObject(object_textbox);
+				showObject(char_madongsuk);
+				script_now = 1;
+				scriptSetup("scene_3", scene[3], script_now, line_num[script_now]);
 			}
 		}
 	}
