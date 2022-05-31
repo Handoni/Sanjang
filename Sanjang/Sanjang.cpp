@@ -11,7 +11,7 @@ SceneID* scene_now;
 TimerID timer_start, timer_fadein, timer_fadeout;
 ObjectID object_arrow, object_start, object_textbox;
 ObjectID text[5];
-ObjectID char_madongsuk;
+ObjectID char_madongsuk, char_hansohyee, char_parkboyeong, char_leedohyeon, char_kimjongkuk, char_ohdalsoo, char_husungtae;
 SoundID sound_rain, sound_knock, sound_open, sound_close, sound_click, sound_beep, sound_type;
 
 int cnt=1, line_num[65], line_now, script_num, script_now=1, scene_num;
@@ -201,6 +201,7 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 					locateObject(char_madongsuk, scene[3], 100, 300);
 					nextScript();
 				}
+
 
 				else
 				{
@@ -412,18 +413,29 @@ void sceneSetup(int n)
 		enterScene(scene[3]);
 		scene_now = &scene[3];
 
-		script_num = 15;
+		script_num = 4;
 		script_now = 1;
 
-		line_num[1] = 4; line_num[2] = 3; line_num[3] = 3; line_num[4] = 4; line_num[5] = 4;
-		line_num[6] = 2; line_num[7] = 4; line_num[8] = 4; line_num[9] = 3; line_num[10] = 4;
-		line_num[11] = 3; line_num[12] = 4; line_num[13] = 3; line_num[14] = 3; line_num[15] = 3;
+		line_num[1] = 4; line_num[2] = 3; line_num[3] = 3; line_num[4] = 4; 
 
 		cnt = 1;
 
 		setTimer(timer_fadein, 0.2f);
 		startTimer(timer_fadein);
 		break;
+	case 4:
+		scene_num = 4;
+		scene[4] = createScene("4", "resources/scene_4/background.png");
+
+
+		line_num[1] = 4; line_num[2] = 2; line_num[3] = 4; line_num[4] = 4; line_num[5] = 3; line_num[6] = 4;
+		line_num[7] = 3; line_num[8] = 4; line_num[9] = 3; line_num[10] = 3; line_num[11] = 3;
+
+		char_hansohyee = createObject("resources/common/char_hansohyee.png");
+		char_parkboyeong = createObject("resources/common/char_parkboyeong.png");
+		char_leedohyeon = createObject("resources/common/char_leedohyeon.png");
+		char_kimjongkuk = createObject("resources/common/char_kimjongkuk.png");
+		char_ohdalsoo = createObject("resources/common/char_ohdalsoo.png"); 
 	default:
 		break;
 	}
