@@ -15,7 +15,7 @@ SceneID scene_main, scene_start, scene[50];
 SceneID saving;
 SceneID* scene_now;
 TimerID timer_start, timer_fadein, timer_fadeout, timer_saving;
-ObjectID object_arrow, object_start, object_textbox, save_text;
+ObjectID object_arrow, object_start, object_textbox, save_text, object_title;
 ObjectID text[5];
 ObjectID char_madongsuk, char_hansohyee, char_parkboyeong, char_leedohyeon, char_kimjongkuk, char_husungtae, char_kimyoonsuk;
 SoundID sound_rain, sound_knock, sound_open, sound_close, sound_click, sound_beep, sound_type;
@@ -54,6 +54,7 @@ int main()
 	setKeyboardCallback(keyboardCallback);
 	setSoundCallback(soundCallback);
 
+	object_title = createObject("resources/scene_main/title.png");
 	object_textbox = createObject("resources/common/textbox.png");
 	object_arrow = createObject("resources/common/arrow.png");
 
@@ -483,6 +484,8 @@ void mainSetup()
 	scene_main = createScene("Main", "resources/scene_main/background.jpg");
 	locateObject(object_textbox, scene_main, 0, 0);
 	showObject(object_textbox);
+	locateObject(object_title, scene_main, 240, 350);
+	showObject(object_title);
 	
 	script_num = 1;
 	script_now = 1;
