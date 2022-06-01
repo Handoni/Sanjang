@@ -29,6 +29,7 @@ void mainSetup();
 void startSetup();
 void sceneSetup(int n);
 void nextScript(bool select=false);
+void sceneStart();
 
 int main()
 {
@@ -114,26 +115,19 @@ void timerCallback(TimerID timer)
 				sceneSetup(1);
 				
 			}
-			if (scene_now == &scene[2])
+			if (scene_num >= 2 && scene_num <= 10)
 			{
-				setSceneLight(scene[2], 1.f);
-				locateObject(object_textbox, scene[2], 0, 0);
-				locateObject(object_arrow, scene[2], 1230, 20);
-				showObject(object_textbox);
-				script_now = 1;
-				scriptSetup("scene_2", scene[2], script_now, line_num[script_now]);
-
-				playSound(sound_knock);
-			}
-			if (scene_now == &scene[3])
-			{
-				setSceneLight(scene[3], 1.f);
-				locateObject(object_textbox, scene[3], 0, 0);
-				locateObject(object_arrow, scene[3], 1230, 20);
-				showObject(object_textbox);
-				showObject(char_madongsuk);
-				script_now = 1;
-				scriptSetup("scene_3", scene[3], script_now, line_num[script_now]);
+				sceneStart();
+				if (scene_now == &scene[2])
+				{
+					playSound(sound_knock);
+				}
+				else if (scene_now == &scene[3])
+				{
+				}
+				else if (scene_now == &scene[4])
+				{
+				}
 			}
 		}
 	}
@@ -425,7 +419,13 @@ void sceneSetup(int n)
 		break;
 	case 4:
 		scene_num = 4;
-		scene[4] = createScene("4", "resources/scene_4/background.png");
+		scene[4] = createScene("4", "resources/scene_4/background.jpg");
+		setSceneLight(scene[4], 0);
+		enterScene(scene[4]);
+		scene_now = &scene[4];
+
+		script_num = 11;
+		script_now = 1;
 
 
 		line_num[1] = 4; line_num[2] = 2; line_num[3] = 4; line_num[4] = 4; line_num[5] = 3; line_num[6] = 4;
@@ -435,8 +435,26 @@ void sceneSetup(int n)
 		char_parkboyeong = createObject("resources/common/char_parkboyeong.png");
 		char_leedohyeon = createObject("resources/common/char_leedohyeon.png");
 		char_kimjongkuk = createObject("resources/common/char_kimjongkuk.png");
-		char_ohdalsoo = createObject("resources/common/char_ohdalsoo.png"); 
+		char_ohdalsoo = createObject("resources/common/char_ohdalsoo.png");
+
+		cnt = 1;
+
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
+		break;
 	default:
 		break;
 	}
+}
+
+void sceneStart()
+{
+	char buff[20];
+	setSceneLight(scene[scene_num], 1.f);
+	locateObject(object_textbox, scene[scene_num], 0, 0);
+	locateObject(object_arrow, scene[scene_num], 1230, 20);
+	showObject(object_textbox);
+	script_now = 1;
+	sprintf_s(buff, sizeof(buff), "scene_%d", scene_num);
+	scriptSetup(buff, scene[scene_num], script_now, line_num[script_now]);
 }
