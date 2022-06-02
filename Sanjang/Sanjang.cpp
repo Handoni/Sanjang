@@ -16,12 +16,13 @@ SceneID saving;
 SceneID* scene_now;
 TimerID timer_start, timer_fadein, timer_fadeout, timer_saving;
 ObjectID object_arrow, object_start, object_textbox, save_text, object_title;
+ObjectID object_deadbody, object_namecard;
 ObjectID text[5];
 ObjectID char_madongsuk, char_hansohyee, char_parkboyeong, char_leedohyeon, char_kimjongkuk, char_husungtae, char_kimyoonsuk;
-SoundID sound_rain, sound_knock, sound_open, sound_close, sound_click, sound_beep, sound_type;
+SoundID sound_rain, sound_knock, sound_open, sound_close, sound_click, sound_beep, sound_type, sound_doong;
 
 int cnt=1, line_num[65], line_now, script_num, script_now=1, scene_num;
-bool on_wait = false, on_select = false, on_load = false;
+bool on_wait = false, on_select = false, on_load = false, on_click = false;
 FILE* savedata;
 
 
@@ -96,6 +97,17 @@ int main()
 
 void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 {
+	if (scene_num == 7)
+	{
+		if (object == object_deadbody)
+		{
+
+		}
+		else if (object == object_namecard)
+		{
+
+		}
+	}
 }
 
 void timerCallback(TimerID timer)
@@ -337,7 +349,21 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 						showObject(char_madongsuk);
 					}
 				}
+				else if (scene_num == 6 && script_now + 1 == 2)
+				{
+					playSound(sound_open);
+					on_wait = false;
 
+
+					setSceneImage(scene[6],"resources/scene_6/background_black.png");
+					hideObject(object_textbox);
+					hideObject(object_arrow);
+					for (int i = 1; i <= 4; i++)
+					{
+						setObjectImage(text[i], "resources/common/text_idle.png");
+					}
+				}
+				
 				else
 				{
 					if (script_now < script_num)
@@ -389,6 +415,25 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 
 void soundCallback(SoundID sound)
 {
+	if (sound == sound_open&&scene_num==6)
+	{
+		playSound(sound_doong);
+
+		locateObject(object_deadbody, scene[6], 400, 200);
+		showObject(object_deadbody);
+	}
+	if (sound == sound_doong)
+	{
+		locateObject(object_textbox, scene[6], 0, 0);
+		showObject(object_textbox);
+		showObject(object_arrow);
+		
+
+		setSceneImage(scene[6], "resources/scene_6/background2.jpg");
+		nextScript();
+		locateObject(char_madongsuk, scene[6], 100, 300);
+		showObject(char_madongsuk);
+	}
 }
 
 const char* countName(int num)
@@ -619,6 +664,8 @@ void sceneSetup(int n)
 		setSceneLight(scene[6], 0);
 		enterScene(scene[6]);
 		scene_now = &scene[6];
+		object_deadbody = createObject("resources/scene_6/object_deadbody.png");
+		sound_doong = createSound("resources/scene_6/sound_doong.mp3");
 
 		script_num = 8;
 		script_now = 1;
@@ -633,6 +680,7 @@ void sceneSetup(int n)
 			startTimer(timer_fadein);
 		}
 		cnt = 1;
+		break;
 	case 7:
 		scene_num = 7;
 		scene[7] = createScene("7", "resources/scene_7/background.jpg");
@@ -640,13 +688,14 @@ void sceneSetup(int n)
 		enterScene(scene[7]);
 		scene_now = &scene[7];
 
+		object_namecard = createObject("resources/scene_7/object_namecard.png");
 		//line 정보 수정 필요
 
 		script_num = 8;
 		script_now = 1;
 
-		line_num[1] = 2; line_num[2] = 2; line_num[3] = 2; line_num[4] = 3; line_num[5] = 3; line_num[6] = 4;
-		line_num[7] = 3; line_num[8] = 4;
+		line_num[1] = 1; line_num[2] = 4; line_num[3] = 2; line_num[4] = 2; line_num[5] = 4; line_num[6] = 4;
+		line_num[7] = 4; line_num[8] = 3;
 
 		if (!on_load)
 		{
@@ -654,6 +703,7 @@ void sceneSetup(int n)
 			startTimer(timer_fadein);
 		}
 		cnt = 1;
+		break;
 	default:
 		break;
 	}
