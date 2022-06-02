@@ -16,17 +16,18 @@ SceneID saving;
 SceneID* scene_now;
 TimerID timer_start, timer_fadein, timer_fadeout, timer_saving;
 ObjectID object_arrow, object_start, object_textbox, save_text, object_title;
-ObjectID object_deadbody, object_namecard;
+ObjectID object_deadbody, object_namecard, object_carrier;
 ObjectID text[5];
 ObjectID char_madongsuk, char_hansohyee, char_parkboyeong, char_leedohyeon, char_kimjongkuk, char_husungtae, char_kimyoonsuk;
 SoundID sound_rain, sound_knock, sound_open, sound_close, sound_click, sound_beep, sound_type, sound_doong;
 
-int cnt=1, line_num[65], line_now, script_num, script_now=1, scene_num;
+int cnt = 1, line_num[65], line_now, script_num, script_now = 1, scene_num;
 bool on_wait = false, on_select = false, on_load = false, on_click = false;
+bool checked[5] = { 0, };
 FILE* savedata;
 
 
-ObjectID createObject(const char* image, SceneID scene, int x, int y, bool shown=true);
+ObjectID createObject(const char* image, SceneID scene, int x, int y, bool shown = true);
 const char* countName(int num);
 const char* scriptName(const char* scene_name, int num, int line);
 void setObject(ObjectID object, const char* image, SceneID scene, int x, int y);
@@ -43,6 +44,7 @@ void sceneStart();
 void saveGame();
 void loadGame();
 int loadData();
+bool judgeChecked(int scriptnum);
 
 int main()
 {
@@ -86,7 +88,7 @@ int main()
 		text[i] = createObject("resources/common/text_idle.png");
 	}
 
-	if(loadData()==1)
+	if (loadData() == 1)
 		return 1;
 
 	mainSetup();
@@ -97,16 +99,43 @@ int main()
 
 void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 {
-	if (scene_num == 7)
+	if (scene_num == 7 && on_click)
 	{
 		if (object == object_deadbody)
 		{
-
+			if (checked[0] == false)
+			{
+				checked[0] = true;
+				script_now = 3;
+				on_click = false;
+				setObjectImage(object_textbox, "resources/common/textbox.png");
+				scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+			}
 		}
 		else if (object == object_namecard)
 		{
+			if (checked[1] == false)
+			{
+				checked[1] = true;
+				script_now = 6;
+				on_click = false;
+				setObjectImage(object_textbox, "resources/common/textbox.png");
+				scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+			}
 
 		}
+		else if (object == object_carrier)
+		{
+			if (checked[2] == false)
+			{
+				checked[2] = true;
+				script_now = 7;
+				on_click = false;
+				setObjectImage(object_textbox, "resources/common/textbox.png");
+				scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+			}
+		}
+
 	}
 }
 
@@ -143,7 +172,7 @@ void timerCallback(TimerID timer)
 	{
 		if (cnt < 10)
 		{
-			setSceneLight(*scene_now, cnt*0.1f);
+			setSceneLight(*scene_now, cnt * 0.1f);
 			cnt++;
 			setTimer(timer_fadein, 0.2f);
 			startTimer(timer_fadein);
@@ -153,7 +182,7 @@ void timerCallback(TimerID timer)
 			if (scene_now == &scene[1])
 			{
 				sceneSetup(1);
-				
+
 			}
 			if (scene_num >= 2 && scene_num <= 10)
 			{
@@ -250,7 +279,9 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				}
 
 				else if (scene_num == 2 && script_now + 1 == 3)
+				{
 					nextScript(true);
+				}
 
 				else if (scene_num == 3 && script_now + 1 == 3)
 				{
@@ -349,21 +380,91 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 						showObject(char_madongsuk);
 					}
 				}
+
 				else if (scene_num == 6 && script_now + 1 == 2)
 				{
 					playSound(sound_open);
 					on_wait = false;
 
 
-					setSceneImage(scene[6],"resources/scene_6/background_black.png");
+					setSceneImage(scene[6], "resources/scene_6/background_black.png");
 					hideObject(object_textbox);
 					hideObject(object_arrow);
 					for (int i = 1; i <= 4; i++)
 					{
 						setObjectImage(text[i], "resources/common/text_idle.png");
 					}
+
+				}
+
+				else if (scene_num == 7 && script_now + 1 == 3)
+				{
+					on_click = true;
+					/*for (int i = 0; i <= 3; i++)
+					{
+						checked[i] = false;
+					}*/
+					for (int i = 1; i <= 4; i++)
+					{
+						hideObject(text[i]);
+					}
+					hideObject(object_arrow);
+					setObjectImage(object_textbox, "resources/common/textbox_half.png");
+					setObject(text[3], "resources/scene_7/text_info.png", scene[7], 100, LINE(4));
+				}
+
+				else if (scene_num == 7 && script_now == 5)
+				{
+					bool judged = judgeChecked(8);
+					if(judged==false)
+					{
+						on_click = true;
+						script_now = 2;
+						for (int i = 1; i <= 4; i++)
+						{
+							hideObject(text[i]);
+						}
+						hideObject(object_arrow);
+						setObjectImage(object_textbox, "resources/common/textbox_half.png");
+						setObject(text[3], "resources/scene_7/text_info.png", scene[7], 100, LINE(4));
+					}
+
 				}
 				
+				else if (scene_num == 7 && script_now == 6)
+				{
+					bool judged = judgeChecked(8);
+					if (judged == false)
+					{
+						on_click = true;
+						script_now = 2;
+						for (int i = 1; i <= 4; i++)
+						{
+							hideObject(text[i]);
+						}
+						hideObject(object_arrow);
+						setObjectImage(object_textbox, "resources/common/textbox_half.png");
+						setObject(text[3], "resources/scene_7/text_info.png", scene[7], 100, LINE(4));
+					}
+				}
+
+				else if (scene_num == 7 && script_now == 7)
+				{
+					bool judged = judgeChecked(8);
+					if (judged == false)
+					{
+						on_click = true;
+						script_now = 2;
+						for (int i = 1; i <= 4; i++)
+						{
+							hideObject(text[i]);
+						}
+						hideObject(object_arrow);
+						setObjectImage(object_textbox, "resources/common/textbox_half.png");
+						setObject(text[3], "resources/scene_7/text_info.png", scene[7], 100, LINE(4));
+					}
+				}
+
 				else
 				{
 					if (script_now < script_num)
@@ -415,7 +516,7 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 
 void soundCallback(SoundID sound)
 {
-	if (sound == sound_open&&scene_num==6)
+	if (sound == sound_open && scene_num == 6)
 	{
 		playSound(sound_doong);
 
@@ -427,7 +528,7 @@ void soundCallback(SoundID sound)
 		locateObject(object_textbox, scene[6], 0, 0);
 		showObject(object_textbox);
 		showObject(object_arrow);
-		
+
 
 		setSceneImage(scene[6], "resources/scene_6/background2.jpg");
 		nextScript();
@@ -454,11 +555,10 @@ const char* scriptName(const char* scene_name, int num, int line)
 	return buff;
 }
 
-void setObject(ObjectID object, const char* image, SceneID scene, int x=-100, int y=-100)
+void setObject(ObjectID object, const char* image, SceneID scene, int x, int y)
 {
 	setObjectImage(object, image);
-	if(x!=0 && y!=0)
-		locateObject(object, scene, x, y);
+	locateObject(object, scene, x, y);
 	showObject(object);
 }
 
@@ -501,13 +601,17 @@ void scriptSetup(const char* scene_name, SceneID scene, int num, int line_num, b
 	{
 		on_select = true;
 		for (int i = 1; i <= line_num; i++)
+		{
 			setObject(text[i], scriptName(scene_name, num, i), scene, 100, LINE(i));
+			showObject(text[i]);
+		}
 
-		for (int i = line_num+1; i <= 4; i++)
+		for (int i = line_num + 1; i <= 4; i++)
 			hideObject(text[i]);
 
 		line_now = 1;
 		locateObject(object_arrow, scene, 50, LINE(line_now) + 25);
+		showObject(object_arrow);
 	}
 	else
 	{
@@ -518,6 +622,7 @@ void scriptSetup(const char* scene_name, SceneID scene, int num, int line_num, b
 			hideObject(text[i]);
 
 		locateObject(object_arrow, scene, 1230, 20);
+		showObject(object_arrow);
 	}
 	on_wait = true;
 
@@ -531,12 +636,12 @@ void mainSetup()
 	showObject(object_textbox);
 	locateObject(object_title, scene_main, 240, 350);
 	showObject(object_title);
-	
+
 	script_num = 1;
 	script_now = 1;
 	line_num[1] = 2;
 	scriptSetup("scene_main", scene_main, script_now, line_num[script_now], true);
-	
+
 	if (file_data.scene_num == 0)
 	{
 		setObjectImage(text[2], "resources/scene_main/select1_line2_nodata.png");
@@ -576,10 +681,10 @@ void sceneSetup(int n)
 		setSceneLight(scene[2], 0);
 		enterScene(scene[2]);
 		scene_now = &scene[2];
-		
+
 		script_num = 5;
 		script_now = 1;
-		
+
 		line_num[1] = 2;
 		line_num[2] = 3;
 		line_num[3] = 2;
@@ -589,7 +694,7 @@ void sceneSetup(int n)
 
 		cnt = 1;
 
-		if (!on_load) 
+		if (!on_load)
 		{
 			setTimer(timer_fadein, 0.2f);
 			startTimer(timer_fadein);
@@ -606,7 +711,7 @@ void sceneSetup(int n)
 		script_num = 4;
 		script_now = 1;
 
-		line_num[1] = 4; line_num[2] = 3; line_num[3] = 3; line_num[4] = 4; 
+		line_num[1] = 4; line_num[2] = 3; line_num[3] = 3; line_num[4] = 4;
 
 		cnt = 1;
 		if (!on_load)
@@ -688,8 +793,16 @@ void sceneSetup(int n)
 		enterScene(scene[7]);
 		scene_now = &scene[7];
 
+		
 		object_namecard = createObject("resources/scene_7/object_namecard.png");
-		//line 정보 수정 필요
+		locateObject(object_namecard, scene[7], 1000, 300);
+		showObject(object_namecard);
+		
+		setObject(object_deadbody, "resources/scene_7/object_deadbody_onclick.png", scene[7], 0, 0);
+				
+		object_carrier = createObject("resources/scene_7/object_carrier.png");
+		locateObject(object_carrier, scene[7], 600, 200);
+		showObject(object_carrier);
 
 		script_num = 8;
 		script_now = 1;
@@ -723,7 +836,7 @@ void sceneStart()
 
 void saveGame()
 {
-	if(scene_num>=1)
+	if (scene_num >= 1)
 	{
 		enterScene(saving);
 
@@ -751,7 +864,7 @@ void saveGame()
 
 int loadData()
 {
-	
+
 	int file_state = fopen_s(&savedata, "resources/data.dat", "r+t");
 	if (file_state != 0)
 	{
@@ -771,5 +884,26 @@ void loadGame()
 	if (scene_num == 5)
 	{
 		playSound(sound_rain, true);
+	}
+}
+
+
+bool judgeChecked(int scriptnum)
+{
+	int i = 0;
+	for (i = 0; i < 3; i++)
+	{
+		if (checked[i] == false)
+			break;
+	}
+	if (i == 3)
+	{
+		script_now = 8;
+		scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
