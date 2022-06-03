@@ -236,6 +236,9 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				{
 					if (selected[line_now] == false)
 					{
+						stopSound(sound_click);
+						playSound(sound_click);
+
 						selected[line_now] = true;
 						if (line_now == 1)	script_now = 7;
 						else if (line_now == 2)	script_now = 11;
@@ -390,6 +393,9 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 
 				else if (scene_num == 7 && (script_now == 5 || script_now == 6 || script_now == 7 || script_now == 8))
 				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
 					setClick();
 				}
 
@@ -397,6 +403,9 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 
 				else if (scene_num == 8 && script_now + 1 == 2)
 				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
 					on_click = true;
 
 					for (int i = 1; i <= 4; i++)
@@ -410,16 +419,25 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 
 				else if (scene_num == 8 && (script_now == 2 || script_now == 3 || script_now == 4))
 				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
 					setClick();
 				}
 
 				else if (scene_num == 8 && script_now + 1 == 6)
 				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
 					nextScript(true);
 				}
 
 				else if (scene_num == 8 && (script_now == 10 || script_now == 12 || script_now == 14 || script_now == 18))
 				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
 					setSelect();
 				}
 
@@ -480,6 +498,9 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 		{
 			if (checked[0] == false)
 			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
 				checked[0] = true;
 				script_now = 3;
 				on_click = false;
@@ -491,6 +512,9 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 		{
 			if (checked[1] == false)
 			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
 				checked[1] = true;
 				script_now = 6;
 				on_click = false;
@@ -503,6 +527,9 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 		{
 			if (checked[2] == false)
 			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
 				checked[2] = true;
 				script_now = 7;
 				on_click = false;
@@ -515,6 +542,9 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 		{
 			if (checked[3] == false)
 			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
 				checked[3] = true;
 				script_now = 8;
 				on_click = false;
@@ -530,6 +560,9 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 		{
 			if (checked[0] == false)
 			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
 				checked[0] = true;
 				script_now = 2;
 				on_click = false;
@@ -541,6 +574,9 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 		{
 			if (checked[1] == false)
 			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
 				checked[1] = true;
 				script_now = 3;
 				on_click = false;
@@ -552,6 +588,9 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 		{
 			if (checked[2] == false)
 			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
 				checked[2] = true;
 				script_now = 4;
 				on_click = false;
