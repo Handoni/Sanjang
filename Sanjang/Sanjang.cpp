@@ -24,7 +24,7 @@ SoundID sound_rain, sound_detecting, sound_knock, sound_open, sound_close, sound
 
 int cnt = 1, line_num[65], line_now, script_num, script_now = 1, scene_num;
 bool on_wait = false, on_select = false, on_load = false, on_click = false;
-bool checked[5] = { 0, }, asked[5] = { 0, };
+bool checked[5] = { 0, }, selected[5] = { 0, };
 FILE* savedata;
 
 
@@ -47,6 +47,8 @@ void loadGame();
 int loadData();
 bool judgeChecked(const char* scene_name, int objectnum, int scriptnum);
 void setClick();
+bool judgeSelected(const char* scene_name, int selectnum, int scriptnum);
+void setSelect();
 
 int main()
 {
@@ -230,6 +232,19 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				{
 					nextScript();
 				}
+				else if (scene_num == 8)
+				{
+					if (selected[line_now] == false)
+					{
+						selected[line_now] = true;
+						if (line_now == 1)	script_now = 7;
+						else if (line_now == 2)	script_now = 11;
+						else if (line_now == 3)	script_now = 13;
+						else if (line_now == 4)	script_now = 17;
+						on_select = false;
+						scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
+					}
+				}
 			}
 			else if (scene_num >= 1)
 			{
@@ -378,7 +393,7 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 					setClick();
 				}
 
-				
+
 
 				else if (scene_num == 8 && script_now + 1 == 2)
 				{
@@ -397,11 +412,17 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				{
 					setClick();
 				}
-				
+
 				else if (scene_num == 8 && script_now + 1 == 6)
 				{
 					nextScript(true);
 				}
+
+				else if (scene_num == 8 && (script_now == 10 || script_now == 12 || script_now == 14 || script_now == 18))
+				{
+					setSelect();
+				}
+
 				else
 				{
 					if (script_now < script_num)
@@ -866,7 +887,47 @@ void sceneSetup(int n)
 		for (int i = 0; i < 5; i++)
 		{
 			checked[i] = false;
-			asked[i] = false;
+			selected[i] = false;
+		}
+
+		object_surgerytool = createObject("resources/scene_8/object_surgerytool.jpg");
+		locateObject(object_surgerytool, scene[8], 1000, 300);
+		showObject(object_surgerytool);
+
+		object_drawer = createObject("resources/scene_8/object_drawer.png");
+		locateObject(object_drawer, scene[8], 600, 200);
+		showObject(object_drawer);
+
+		object_wallet = createObject("resources/scene_8/object_wallet.png");
+		locateObject(object_wallet, scene[8], 300, 200);
+		showObject(object_wallet);
+
+		script_num = 19;
+		script_now = 1;
+
+		line_num[1] = 1; line_num[2] = 3; line_num[3] = 3; line_num[4] = 3; line_num[5] = 3; line_num[6] = 4;
+		line_num[7] = 2; line_num[8] = 2; line_num[9] = 2; line_num[10] = 2; line_num[11] = 2; line_num[12] = 2;
+		line_num[13] = 2; line_num[14] = 3; line_num[15] = 2; line_num[16] = 3; line_num[17] = 2; line_num[18] = 2; line_num[19] = 2;
+
+		if (!on_load)
+		{
+			setTimer(timer_fadein, 0.2f);
+			startTimer(timer_fadein);
+		}
+		cnt = 1;
+		break;
+	case 9:
+		//수정필요
+		scene_num = 9;
+		scene[9] = createScene("9", "resources/scene_9/background.jpg");
+		setSceneLight(scene[9], 0);
+		enterScene(scene[9]);
+		scene_now = &scene[9];
+
+		for (int i = 0; i < 5; i++)
+		{
+			checked[i] = false;
+			selected[i] = false;
 		}
 
 		object_surgerytool = createObject("resources/scene_8/object_surgerytool.jpg");
@@ -1016,5 +1077,57 @@ void setClick()
 		hideObject(object_arrow);
 		setObjectImage(object_textbox, "resources/common/textbox_half.png");
 		setObject(text[3], "resources/common/text_info.png", scene[scene_num], 100, LINE(4));
+	}
+}
+
+bool judgeSelected(const char* scene_name, int selectnum, int scriptnum)
+{
+	int i;
+	for (i = 1; i <= selectnum; i++)
+	{
+		if (selected[i] == false)
+			break;
+	}
+	if (i == selectnum + 1)
+	{
+		script_now = scriptnum;
+		on_select = false;
+		scriptSetup(scene_name, scene[scene_num], script_now, line_num[script_now], false);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void setSelect()
+{
+	char scene_name[50];
+	sprintf_s(scene_name, sizeof(scene_name), "scene_%d", scene_num);
+	bool judged = false;
+	if (scene_num == 8)
+	{
+		judged = judgeSelected(scene_name, 4, 19);
+	}
+	if (judged == false)
+	{
+		on_select = true;
+		on_wait = false;
+		script_now = 6;
+		for (int i = 1; i <= 4; i++)
+		{
+			hideObject(text[i]);
+		}
+		scriptSetup(scene_name, *scene_now, script_now, line_num[script_now], true);
+		for (int i = 1; i < 5; i++)
+		{
+			if (selected[i] == true)
+			{
+				char buff[100];
+				sprintf_s(buff, sizeof(buff), "resources/scene_8/select6_line%d_selected.png", i);
+				setObjectImage(text[i], buff);
+			}
+		}
 	}
 }
