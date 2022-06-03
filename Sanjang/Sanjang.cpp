@@ -817,6 +817,35 @@ void sceneSetup(int n)
 		}
 		cnt = 1;
 		break;
+	case 8:
+		scene_num = 8;
+		scene[8] = createScene("8", "resources/scene_8/background.jpg");
+		setSceneLight(scene[8], 0);
+		enterScene(scene[8]);
+		scene_now = &scene[8];
+
+
+		object_namecard = createObject("resources/scene_7/object_namecard.png");
+		locateObject(object_namecard, scene[7], 1000, 300);
+		showObject(object_namecard);
+				
+		object_carrier = createObject("resources/scene_7/object_carrier.png");
+		locateObject(object_carrier, scene[7], 600, 200);
+		showObject(object_carrier);
+
+		script_num = 8;
+		script_now = 1;
+
+		line_num[1] = 1; line_num[2] = 4; line_num[3] = 2; line_num[4] = 2; line_num[5] = 4; line_num[6] = 4;
+		line_num[7] = 4; line_num[8] = 3;
+
+		if (!on_load)
+		{
+			setTimer(timer_fadein, 0.2f);
+			startTimer(timer_fadein);
+		}
+		cnt = 1;
+		break;
 	default:
 		break;
 	}
