@@ -16,20 +16,25 @@ SceneID saving;
 SceneID* scene_now;
 TimerID timer_start, timer_fadein, timer_fadeout, timer_saving;
 ObjectID object_arrow, object_start, object_textbox, save_text, object_title;
+ObjectID object_detectfile,icon_file;
 ObjectID object_deadbody, object_namecard, object_carrier, object_knives;
 ObjectID object_surgerytool, object_drawer, object_wallet, object_knife, object_gloves;
-ObjectID object_backpack, object_notebook, object_notebookpad, object_card, object_gps, object_dadpicture;
+ObjectID object_backpack, object_notebook, object_notebookpad, object_student, object_card, object_gps, object_dadpicture;
 ObjectID object_bigbackpack, object_note, object_ring;
-ObjectID object_tool, object_file, object_note_detective;
+ObjectID object_tool, object_file, object_note_detective, object_exercisetool;
+ObjectID object_girlclothes;
 ObjectID object_picture[6];
 ObjectID text[5];
 ObjectID char_madongsuk, char_hansohyee, char_parkboyeong, char_leedohyeon, char_kimjongkuk, char_husungtae, char_kimyoonsuk;
+ObjectID icons[20];
 ObjectID* char_now;
 SoundID sound_rain, sound_detecting, sound_knock, sound_open, sound_close, sound_click, sound_beep, sound_type, sound_doong, sound_screaming;
 
 int cnt = 1, line_num[65], line_now, script_num, script_now = 1, scene_num;
 bool on_wait = false, on_select = false, on_load = false, on_click = false;
 bool checked[5] = { 0, }, selected[5] = { 0, };
+bool showIcons[20] = { 0, };
+bool showing_Icons = false;
 FILE* savedata;
 
 
@@ -55,6 +60,7 @@ void setClick();
 bool judgeSelected(const char* scene_name, int selectnum, int scriptnum);
 void setSelect();
 void selectedObject();
+void setIcons();
 
 int main()
 {
@@ -70,6 +76,9 @@ int main()
 	object_title = createObject("resources/scene_main/title.png");
 	object_textbox = createObject("resources/common/textbox.png");
 	object_arrow = createObject("resources/common/arrow.png");
+
+	icon_file = createObject("resources/icons/icon_file.png");
+	object_detectfile = createObject("resources/common/detectfile.png");
 
 	sound_knock = createSound("resources/common/door_knock.mp3");
 	sound_open = createSound("resources/common/door_open.mp3");
@@ -93,6 +102,8 @@ int main()
 	timer_fadeout = createTimer(0.2f);
 
 	saving = createScene("saving");
+
+	setIcons();
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -199,7 +210,7 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 {
 	if (keycode == KeyCode::KEY_ENTER && keystate == KeyState::KEY_PRESSED && on_wait)
 	{
-		if (on_wait)
+		if (on_wait && !showing_Icons)
 		{
 			if (on_select)
 			{
@@ -530,10 +541,11 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				}
 				else if (scene_num == 9 && (script_now == 2 || script_now == 3 || script_now == 4 || script_now == 5))
 				{
-				hideObject(object_card);
-				hideObject(object_gps);
-				hideObject(object_dadpicture);
-				hideObject(object_picture[2]);
+					hideObject(object_card);
+					hideObject(object_gps);
+					hideObject(object_dadpicture);
+					hideObject(object_student);
+					hideObject(object_picture[2]);
 
 					stopSound(sound_click);
 					playSound(sound_click);
@@ -551,6 +563,7 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				}
 				else if (scene_num == 9 && (script_now == 10 || script_now == 13 || script_now == 15 || script_now == 17))
 				{
+				
 					stopSound(sound_click);
 					playSound(sound_click);
 
@@ -580,6 +593,9 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				}
 				else if (scene_num == 10 && (script_now == 2 || script_now == 3 || script_now == 4 || script_now == 5))
 				{
+					hideObject(object_ring);
+					hideObject(object_picture[3]);
+
 					stopSound(sound_click);
 					playSound(sound_click);
 
@@ -625,6 +641,8 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				}
 				else if (scene_num == 11 && (script_now == 2 || script_now == 3 || script_now == 4))
 				{
+				hideObject(object_exercisetool);
+				hideObject(object_picture[4]);
 					stopSound(sound_click);
 					playSound(sound_click);
 
@@ -673,6 +691,8 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				{
 					stopSound(sound_click);
 					playSound(sound_click);
+
+					hideObject(object_picture[4]);
 
 					locateObject(*char_now, scene[scene_num], 100, 300);
 					showObject(*char_now);
@@ -744,341 +764,390 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 
 void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 {
-	if (scene_num == 7 && on_click)
+	if (!showing_Icons)
 	{
-		if (object == object_deadbody)
+		if (scene_num == 7 && on_click)
 		{
-			if (checked[0] == false)
+			if (object == object_deadbody)
 			{
-				stopSound(sound_click);
-				playSound(sound_click);
+				if (checked[0] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
 
-				checked[0] = true;
-				script_now = 3;
-				on_click = false;
-				scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+					checked[0] = true;
+					script_now = 3;
+					on_click = false;
+					showIcons[0] = true;
+					scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
 			}
-			else
+			else if (object == object_namecard)
 			{
-				selectedObject();
+				if (checked[1] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					showIcons[2] = true;
+					checked[1] = true;
+					script_now = 6;
+					on_click = false;
+					scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
+
+			}
+			else if (object == object_carrier)
+			{
+				if (checked[2] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					showIcons[3] = true;
+					checked[2] = true;
+					script_now = 7;
+					on_click = false;
+					scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
+			}
+
+			else if (object == object_knives)
+			{
+				if (checked[3] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					showIcons[1] = true;
+					checked[3] = true;
+					script_now = 8;
+					on_click = false;
+					scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
+			}
+
+		}
+		else if (scene_num == 8 && on_click)
+		{
+			if (object == object_surgerytool)
+			{
+				if (checked[0] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					showIcons[4] = true;
+					checked[0] = true;
+					script_now = 2;
+					on_click = false;
+					scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
+			}
+			else if (object == object_drawer)
+			{
+				if (checked[1] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					showObject(object_knife);
+					showObject(object_gloves);
+					showIcons[5] = true;
+					checked[1] = true;
+					script_now = 3;
+					on_click = false;
+					scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
+			}
+			else if (object == object_wallet)
+			{
+				if (checked[2] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					locateObject(object_picture[1], scene[8], 500, 300);
+					showObject(object_picture[1]);
+
+
+					checked[2] = true;
+					script_now = 4;
+					on_click = false;
+
+
+					scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
 			}
 		}
-		else if (object == object_namecard)
+		else if (scene_num == 9 && on_click)
 		{
-			if (checked[1] == false)
+			if (object == object_backpack)
 			{
-				stopSound(sound_click);
-				playSound(sound_click);
+				if (checked[0] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
 
-				checked[1] = true;
-				script_now = 6;
-				on_click = false;
-				scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+					showObject(object_student);
+
+					checked[0] = true;
+					script_now = 2;
+					on_click = false;
+					scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
+
 			}
-			else
+			else if (object == object_notebook)
 			{
-				selectedObject();
-			}
+				if (checked[1] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
 
+					showObject(object_card);
+					showIcons[6] = true;
+					checked[1] = true;
+					script_now = 3;
+					on_click = false;
+					scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
+				}
+				else if (checked[2] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					showObject(object_gps);
+					checked[2] = true;
+					script_now = 4;
+					on_click = false;
+					scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
+			}
+			else if (object == object_notebookpad)
+			{
+				if (checked[3] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					showIcons[7] = true;
+					locateObject(object_picture[2], scene[9], 400, 300);
+					showObject(object_picture[2]);
+					showObject(object_dadpicture);
+
+					checked[3] = true;
+					script_now = 5;
+					on_click = false;
+					scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
+			}
 		}
-		else if (object == object_carrier)
+		else if (scene_num == 10 && on_click)
 		{
-			if (checked[2] == false)
+			if (object == object_bigbackpack)
 			{
-				stopSound(sound_click);
-				playSound(sound_click);
+				if (checked[0] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					showIcons[8] = true;
+					showIcons[9] = true;
+					showObject(object_ring);
+					checked[0] = true;
+					script_now = 2;
+					on_click = false;
+					scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
+				}
+				else if (checked[1] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
 
-				checked[2] = true;
-				script_now = 7;
-				on_click = false;
-				scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+					checked[1] = true;
+					script_now = 3;
+					on_click = false;
+					scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
+
 			}
-			else
+			else if (object == object_note)
 			{
-				selectedObject();
+				if (checked[2] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					showIcons[10] = true;
+					checked[2] = true;
+					script_now = 4;
+					on_click = false;
+					scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
+				}
+				else if (checked[3] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					locateObject(object_picture[3], scene[10], 500, 300);
+					showObject(object_picture[3]);
+
+					checked[3] = true;
+					script_now = 5;
+					on_click = false;
+					scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
 			}
 		}
-
-		else if (object == object_knives)
+		else if (scene_num == 11 && on_click)
 		{
-			if (checked[3] == false)
+			if (object == object_tool)
 			{
-				stopSound(sound_click);
-				playSound(sound_click);
+				if (checked[0] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
 
-				checked[3] = true;
-				script_now = 8;
-				on_click = false;
-				scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+					showObject(object_exercisetool);
+					showIcons[11] = true;
+					checked[0] = true;
+					script_now = 2;
+					on_click = false;
+					scriptSetup("scene_11", scene[11], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
+
 			}
-			else
+			else if (object == object_note_detective)
 			{
-				selectedObject();
+				if (checked[1] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					showIcons[12] = true;
+					checked[1] = true;
+					script_now = 3;
+					on_click = false;
+					scriptSetup("scene_11", scene[11], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
+			}
+			else if (object == object_file)
+			{
+				if (checked[2] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					locateObject(object_picture[4], scene[11], 550, 300);
+					showObject(object_picture[4]);
+					showIcons[13] = true;
+					checked[2] = true;
+					script_now = 4;
+					on_click = false;
+					scriptSetup("scene_11", scene[11], script_now, line_num[script_now], false);
+				}
+				else
+				{
+					selectedObject();
+				}
 			}
 		}
+		else if (scene_num == 12 && on_click)
+		{
+			if (object == object_carrier)
+			{
+				if (checked[0] == false)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					showIcons[14] = true;
+					checked[0] = true;
+					script_now = 3;
+					on_click = false;
+					scriptSetup("scene_12", scene[12], script_now, line_num[script_now], false);
 
+					locateObject(object_picture[5], scene[12], 550, 300);
+					showObject(object_picture[5]);
+				}
+			}
+		}
 	}
-	else if (scene_num == 8 && on_click)
+	if (object == icon_file)
 	{
-		if (object == object_surgerytool)
+		if (!showing_Icons)
 		{
-			if (checked[0] == false)
+			locateObject(object_detectfile, scene[scene_num], 400, 300);
+			showObject(object_detectfile);
+			showing_Icons = true;
+			for (int i = 0; i <= 14; i++)
 			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				checked[0] = true;
-				script_now = 2;
-				on_click = false;
-				scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
-			}
-			else
-			{
-				selectedObject();
+				if (showIcons[i])
+				{
+					locateObject(icons[i], scene[scene_num], 500 + (i % 4) * 100, 600 - (i / 4) * 100);
+					showObject(icons[i]);
+				}
 			}
 		}
-		else if (object == object_drawer)
+		else
 		{
-			if (checked[1] == false)
+			hideObject(object_detectfile);
+			for (int i = 0; i <= 14; i++)
 			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				showObject(object_knife);
-				showObject(object_gloves);
-
-				checked[1] = true;
-				script_now = 3;
-				on_click = false;
-				scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
+				locateObject(icons[i], scene[scene_num], 0, 0);
+				if (showIcons[i])
+					hideObject(icons[i]);
 			}
-			else
-			{
-				selectedObject();
-			}
-		}
-		else if (object == object_wallet)
-		{
-			if (checked[2] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				locateObject(object_picture[1], scene[8], 500, 300);
-				showObject(object_picture[1]);
-
-				checked[2] = true;
-				script_now = 4;
-				on_click = false;
-
-
-				scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
-			}
-			else
-			{
-				selectedObject();
-			}
-		}
-	}
-	else if (scene_num == 9 && on_click)
-	{
-		if (object == object_backpack)
-		{
-			if (checked[0] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				checked[0] = true;
-				script_now = 2;
-				on_click = false;
-				scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
-			}
-			else
-			{
-				selectedObject();
-			}
-
-		}
-		else if (object == object_notebook)
-		{
-			if (checked[1] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				showObject(object_card);
-
-				checked[1] = true;
-				script_now = 3;
-				on_click = false;
-				scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
-			}
-			else if (checked[2] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-				
-				showObject(object_gps);
-
-				checked[2] = true;
-				script_now = 4;
-				on_click = false;
-				scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
-			}
-			else
-			{
-				selectedObject();
-			}
-		}
-		else if (object == object_notebookpad)
-		{
-			if (checked[3] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				locateObject(object_picture[2], scene[9], 400, 300);
-				showObject(object_picture[2]);
-
-				checked[3] = true;
-				script_now = 5;
-				on_click = false;
-				scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
-			}
-			else
-			{
-				selectedObject();
-			}
-		}
-	}
-	else if (scene_num == 10 && on_click)
-	{
-		if (object == object_bigbackpack)
-		{
-			if (checked[0] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				checked[0] = true;
-				script_now = 2;
-				on_click = false;
-				scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
-			}
-			else if (checked[1] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				checked[1] = true;
-				script_now = 3;
-				on_click = false;
-				scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
-			}
-			else
-			{
-				selectedObject();
-			}
-
-		}
-		else if (object == object_note)
-		{
-			if (checked[2] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				checked[2] = true;
-				script_now = 4;
-				on_click = false;
-				scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
-			}
-			else if (checked[3] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				checked[3] = true;
-				script_now = 5;
-				on_click = false;
-				scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
-			}
-			else
-			{
-				selectedObject();
-			}
-		}
-	}
-	else if (scene_num == 11 && on_click)
-	{
-		if (object == object_tool)
-		{
-			if (checked[0] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				checked[0] = true;
-				script_now = 2;
-				on_click = false;
-				scriptSetup("scene_11", scene[11], script_now, line_num[script_now], false);
-			}
-			else
-			{
-				selectedObject();
-			}
-
-		}
-		else if (object == object_note_detective)
-		{
-			if (checked[1] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				checked[1] = true;
-				script_now = 3;
-				on_click = false;
-				scriptSetup("scene_11", scene[11], script_now, line_num[script_now], false);
-			}
-			else
-			{
-				selectedObject();
-			}
-		}
-		else if (object == object_file)
-		{
-			if (checked[2] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				checked[2] = true;
-				script_now = 4;
-				on_click = false;
-				scriptSetup("scene_11", scene[11], script_now, line_num[script_now], false);
-			}
-			else
-			{
-				selectedObject();
-			}
-		}
-	}
-	else if (scene_num == 12 && on_click)
-	{
-		if (object == object_carrier)
-		{
-			if (checked[0] == false)
-			{
-				stopSound(sound_click);
-				playSound(sound_click);
-
-				checked[0] = true;
-				script_now = 3;
-				on_click = false;
-				scriptSetup("scene_12", scene[12], script_now, line_num[script_now], false);
-			}
+			showing_Icons = false;
+			
 		}
 	}
 }
@@ -1355,6 +1424,8 @@ void sceneSetup(int n)
 		enterScene(scene[7]);
 		scene_now = &scene[7];
 
+		locateObject(icon_file, scene[7], 30, 630);
+		showObject(icon_file);
 
 		object_namecard = createObject("resources/scene_7/object_namecard.png");
 		locateObject(object_namecard, scene[7], 1000, 300);
@@ -1369,7 +1440,7 @@ void sceneSetup(int n)
 		showObject(object_carrier);
 
 		object_knives = createObject("resources/scene_7/object_knives.png");
-		locateObject(object_knives, scene[7], 400, 200);
+		locateObject(object_knives, scene[7], 450, 200);
 		showObject(object_knives);
 
 		for (int i = 0; i < 5; i++)
@@ -1395,12 +1466,18 @@ void sceneSetup(int n)
 		scene_now = &scene[8];
 		char_now = &char_hansohyee;
 
+		locateObject(icon_file, scene[8], 30, 630);
+		showObject(icon_file);
+
 		for (int i = 0; i < 5; i++)
 		{
 			checked[i] = false;
 			selected[i] = false;
 		}
-
+		for (int i = 0; i <= 3; i++)
+		{
+			showIcons[i] = true;
+		}
 		object_surgerytool = createObject("resources/scene_8/object_surgerytool.jpg");
 		locateObject(object_surgerytool, scene[8], 1000, 300);
 		showObject(object_surgerytool);
@@ -1440,13 +1517,20 @@ void sceneSetup(int n)
 		scene_now = &scene[9];
 		char_now = &char_leedohyeon;
 
+		locateObject(icon_file, scene[9], 30, 630);
+		showObject(icon_file);
+
 		for (int i = 0; i < 5; i++)
 		{
 			checked[i] = false;
 			selected[i] = false;
 		}
+		for (int i = 0; i <= 5; i++)
+		{
+			showIcons[i] = true;
+		}
 
-		object_backpack = createObject("resources/scene_9/object_backback.png");
+		object_backpack = createObject("resources/scene_9/object_backpack.png");
 		locateObject(object_backpack, scene[9], 650, 200);
 		showObject(object_backpack);
 
@@ -1458,19 +1542,22 @@ void sceneSetup(int n)
 		locateObject(object_notebookpad, scene[9], 1000, 300);
 		showObject(object_notebookpad);
 
+		object_student = createObject("resources/scene_9/object_student.png");
+		locateObject(object_student, scene[9], 550, 300);
+
 		object_gps = createObject("resources/scene_9/object_gps.jpg");
 		locateObject(object_gps, scene[9], 360, 300);
 
 		object_card = createObject("resources/scene_9/object_card.jpg");
 		locateObject(object_card, scene[9], 360, 300);
 
-		object_dadpicture = createObject("resources/scene_9/object_dadpicture.jpg");
+		object_dadpicture = createObject("resources/scene_9/object_dadpicture.png");
 		locateObject(object_dadpicture, scene[9], 700, 300);
 
 		script_num = 18;
 		script_now = 1;
 
-		line_num[1] = 1; line_num[2] = 3; line_num[3] = 4; line_num[4] = 3; line_num[5] = 3; line_num[6] = 3;
+		line_num[1] = 1; line_num[2] = 3; line_num[3] = 4; line_num[4] = 3; line_num[5] = 4; line_num[6] = 3;
 		line_num[7] = 4; line_num[8] = 2; line_num[9] = 2; line_num[10] = 2; line_num[11] = 2; line_num[12] = 2;
 		line_num[13] = 2; line_num[14] = 2; line_num[15] = 2; line_num[16] = 2; line_num[17] = 2; line_num[18] = 2;
 
@@ -1486,13 +1573,21 @@ void sceneSetup(int n)
 		scene_now = &scene[10];
 		char_now = &char_kimyoonsuk;
 
+		locateObject(icon_file, scene[10], 30, 630);
+		showObject(icon_file);
+
 		for (int i = 0; i < 5; i++)
 		{
 			checked[i] = false;
 			selected[i] = false;
 		}
 
-		object_bigbackpack = createObject("resources/scene_10/object_bigbackback.png");
+		for (int i = 0; i <= 7; i++)
+		{
+			showIcons[i] = true;
+		}
+
+		object_bigbackpack = createObject("resources/scene_10/object_bigbackpack.png");
 		locateObject(object_bigbackpack, scene[10], 650, 200);
 		showObject(object_bigbackpack);
 
@@ -1500,13 +1595,13 @@ void sceneSetup(int n)
 		locateObject(object_note, scene[10], 1000, 300);
 		showObject(object_note);
 
-		object_ring = createObject("resources/scene_10/object_ring.jpg");
-		locateObject(object_ring, scene[10], 360, 300);
+		object_ring = createObject("resources/scene_10/object_ring.png");
+		locateObject(object_ring, scene[10], 550, 300);
 
 		script_num = 22;
 		script_now = 1;
 
-		line_num[1] = 1; line_num[2] = 3; line_num[3] = 4; line_num[4] = 4; line_num[5] = 4; line_num[6] = 3;
+		line_num[1] = 1; line_num[2] = 4; line_num[3] = 4; line_num[4] = 4; line_num[5] = 4; line_num[6] = 3;
 		line_num[7] = 4; line_num[8] = 2; line_num[9] = 2; line_num[10] = 2; line_num[11] = 3; line_num[12] = 2;
 		line_num[13] = 3; line_num[14] = 2; line_num[15] = 2; line_num[16] = 2; line_num[17] = 2; line_num[18] = 2;
 		line_num[19] = 2; line_num[20] = 2; line_num[21] = 3; line_num[22] = 2;
@@ -1523,10 +1618,18 @@ void sceneSetup(int n)
 		scene_now = &scene[11];
 		char_now = &char_kimjongkuk;
 
+		locateObject(icon_file, scene[11], 30, 630);
+		showObject(icon_file);
+
 		for (int i = 0; i < 5; i++)
 		{
 			checked[i] = false;
 			selected[i] = false;
+		}
+
+		for (int i = 0; i <= 10; i++)
+		{
+			showIcons[i] = true;
 		}
 
 		object_tool = createObject("resources/scene_11/object_tool.png");
@@ -1540,6 +1643,9 @@ void sceneSetup(int n)
 		object_note_detective = createObject("resources/scene_11/object_note_detective.png");
 		locateObject(object_note_detective, scene[11], 1000, 300);
 		showObject(object_note_detective);
+
+		object_exercisetool = createObject("resources/scene_11/object_exercisetool.png");
+		locateObject(object_exercisetool, scene[11], 550, 300);
 
 		script_num = 16;
 		script_now = 1;
@@ -1560,6 +1666,15 @@ void sceneSetup(int n)
 		scene_now = &scene[12];
 		char_now = &char_parkboyeong;
 
+		locateObject(icon_file, scene[12], 30, 630);
+		showObject(icon_file);
+
+
+		for (int i = 0; i <= 13; i++)
+		{
+			showIcons[i] = true;
+		}
+
 		for (int i = 0; i < 5; i++)
 		{
 			checked[i] = false;
@@ -1570,9 +1685,28 @@ void sceneSetup(int n)
 		locateObject(object_carrier, scene[12], 650, 200);
 		showObject(object_carrier);
 
+		object_girlclothes = createObject("resources/scene_12/object_girlclothes.png");
+		locateObject(object_carrier, scene[12], 650, 200);
+
 		sound_screaming = createSound("resources/scene_12/screaming.mp3");
 
 		script_num = 7;
+		script_now = 1;
+
+		line_num[1] = 1; line_num[2] = 4; line_num[3] = 3; line_num[4] = 4;
+		line_num[5] = 3; line_num[6] = 2; line_num[7] = 1;
+
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
+		cnt = 1;
+		break;
+	case 13:
+		scene_num = 13;
+		scene[13] = createScene("13", "resources/scene_13/background.jpg");
+		setSceneLight(scene[13], 0);
+		enterScene(scene[13]);
+		scene_now = &scene[13]; 
+		script_num = 62;
 		script_now = 1;
 
 		line_num[1] = 1; line_num[2] = 4; line_num[3] = 3; line_num[4] = 4;
@@ -1823,4 +1957,23 @@ void selectedObject()
 	showObject(object_arrow);
 	setObject(text[3], "resources/common/text_selected.png", scene[scene_num], 100, LINE(4));
 	on_wait = true;
+}
+
+void setIcons()
+{
+	icons[0] = createObject("resources/icons/deadbody.png");
+	icons[1] = createObject("resources/icons/knives.png");
+	icons[2] = createObject("resources/icons/namecard.png");
+	icons[3] = createObject("resources/icons/carrier.png");
+	icons[4] = createObject("resources/icons/surgerytool.png");
+	icons[5] = createObject("resources/icons/gloves.png");
+	icons[6] = createObject("resources/icons/notebook.png");
+	icons[7] = createObject("resources/icons/dadpicture.png");
+	icons[8] = createObject("resources/icons/ring.png");
+	icons[9] = createObject("resources/icons/bigbackpack.png");
+	icons[10] = createObject("resources/icons/note.png");
+	icons[11] = createObject("resources/icons/tool.png");
+	icons[12] = createObject("resources/icons/note_detective.png");
+	icons[13] = createObject("resources/icons/file.png");
+	icons[14] = createObject("resources/icons/girlclothes.png");
 }
