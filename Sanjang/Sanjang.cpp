@@ -18,8 +18,11 @@ TimerID timer_start, timer_fadein, timer_fadeout, timer_saving;
 ObjectID object_arrow, object_start, object_textbox, save_text, object_title;
 ObjectID object_deadbody, object_namecard, object_carrier, object_knives;
 ObjectID object_surgerytool, object_drawer, object_wallet;
+ObjectID object_backpack, object_notebook, object_notebookpad;
+ObjectID object_bigbackpack, object_note;
 ObjectID text[5];
 ObjectID char_madongsuk, char_hansohyee, char_parkboyeong, char_leedohyeon, char_kimjongkuk, char_husungtae, char_kimyoonsuk;
+ObjectID* char_now;
 SoundID sound_rain, sound_detecting, sound_knock, sound_open, sound_close, sound_click, sound_beep, sound_type, sound_doong;
 
 int cnt = 1, line_num[65], line_now, script_num, script_now = 1, scene_num;
@@ -49,6 +52,7 @@ bool judgeChecked(const char* scene_name, int objectnum, int scriptnum);
 void setClick();
 bool judgeSelected(const char* scene_name, int selectnum, int scriptnum);
 void setSelect();
+void selectedObject();
 
 int main()
 {
@@ -176,7 +180,7 @@ void timerCallback(TimerID timer)
 		}
 		else if (cnt == 0)
 		{
-			if (scene_num == 4)
+			if (scene_num == 4 || scene_num >= 6 && scene_num <= 11)
 				saveGame();
 
 			else
@@ -246,6 +250,38 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 						else if (line_now == 4)	script_now = 17;
 						on_select = false;
 						scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
+					}
+				}
+				else if (scene_num == 9)
+				{
+					if (selected[line_now] == false)
+					{
+						stopSound(sound_click);
+						playSound(sound_click);
+
+						selected[line_now] = true;
+						if (line_now == 1)	script_now = 8;
+						else if (line_now == 2)	script_now = 11;
+						else if (line_now == 3)	script_now = 14;
+						else if (line_now == 4)	script_now = 16;
+						on_select = false;
+						scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
+					}
+				}
+				else if (scene_num == 10)
+				{
+					if (selected[line_now] == false)
+					{
+						stopSound(sound_click);
+						playSound(sound_click);
+
+						selected[line_now] = true;
+						if (line_now == 1)	script_now = 8;
+						else if (line_now == 2)	script_now = 12;
+						else if (line_now == 3)	script_now = 16;
+						else if (line_now == 4)	script_now = 20;
+						on_select = false;
+						scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
 					}
 				}
 			}
@@ -322,6 +358,7 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 						showObject(char_madongsuk);
 					}
 				}
+
 				else if (scene_num == 5 && script_now + 1 >= 3 && script_now + 1 <= 8)
 				{
 					nextScript();
@@ -399,6 +436,13 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 					setClick();
 				}
 
+				else if (scene_num == 7 && script_now == -1)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					setClick();
+				}
+
 
 
 				else if (scene_num == 8 && script_now + 1 == 2)
@@ -416,7 +460,6 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 					setObjectImage(object_textbox, "resources/common/textbox_half.png");
 					setObject(text[3], "resources/common/text_info.png", scene[scene_num], 100, LINE(4));
 				}
-
 				else if (scene_num == 8 && (script_now == 2 || script_now == 3 || script_now == 4))
 				{
 					stopSound(sound_click);
@@ -424,21 +467,117 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 
 					setClick();
 				}
-
 				else if (scene_num == 8 && script_now + 1 == 6)
 				{
 					stopSound(sound_click);
 					playSound(sound_click);
 
+					locateObject(*char_now, scene[scene_num], 100, 300);
+					showObject(*char_now);
 					nextScript(true);
 				}
-
 				else if (scene_num == 8 && (script_now == 10 || script_now == 12 || script_now == 14 || script_now == 18))
 				{
 					stopSound(sound_click);
 					playSound(sound_click);
 
 					setSelect();
+				}
+				else if (scene_num == 8 && script_now == -1)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					setClick();
+				}
+
+				else if (scene_num == 9 && script_now + 1 == 2)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					on_click = true;
+
+					for (int i = 1; i <= 4; i++)
+					{
+						hideObject(text[i]);
+					}
+					hideObject(object_arrow);
+					setObjectImage(object_textbox, "resources/common/textbox_half.png");
+					setObject(text[3], "resources/common/text_info.png", scene[scene_num], 100, LINE(4));
+				}
+				else if (scene_num == 9 && (script_now == 2 || script_now == 3 || script_now == 4 || script_now == 5))
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					setClick();
+				}
+				else if (scene_num == 9 && script_now + 1 == 7)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					locateObject(*char_now, scene[scene_num], 100, 300);
+					showObject(*char_now);
+					nextScript(true);
+				}
+				else if (scene_num == 9 && (script_now == 10 || script_now == 13 || script_now == 15 || script_now == 17))
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					setSelect();
+				}
+				else if (scene_num == 9 && script_now == -1)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					setClick();
+				}
+
+				else if (scene_num == 10 && script_now + 1 == 2)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					on_click = true;
+
+					for (int i = 1; i <= 4; i++)
+					{
+						hideObject(text[i]);
+					}
+					hideObject(object_arrow);
+					setObjectImage(object_textbox, "resources/common/textbox_half.png");
+					setObject(text[3], "resources/common/text_info.png", scene[scene_num], 100, LINE(4));
+				}
+				else if (scene_num == 10 && (script_now == 2 || script_now == 3 || script_now == 4 || script_now == 5))
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					setClick();
+				}
+				else if (scene_num == 10 && script_now + 1 == 7)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					locateObject(*char_now, scene[scene_num], 100, 300);
+					showObject(*char_now);
+					nextScript(true);
+				}
+				else if (scene_num == 10 && (script_now == 11 || script_now == 15 || script_now == 19 || script_now == 21))
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+
+					setSelect();
+				}
+				else if (scene_num == 10 && script_now == -1)
+				{
+					stopSound(sound_click);
+					playSound(sound_click);
+					setClick();
 				}
 
 				else
@@ -504,8 +643,11 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 				checked[0] = true;
 				script_now = 3;
 				on_click = false;
-				setObjectImage(object_textbox, "resources/common/textbox.png");
 				scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
 			}
 		}
 		else if (object == object_namecard)
@@ -518,8 +660,11 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 				checked[1] = true;
 				script_now = 6;
 				on_click = false;
-				setObjectImage(object_textbox, "resources/common/textbox.png");
 				scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
 			}
 
 		}
@@ -533,8 +678,11 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 				checked[2] = true;
 				script_now = 7;
 				on_click = false;
-				setObjectImage(object_textbox, "resources/common/textbox.png");
 				scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
 			}
 		}
 
@@ -548,13 +696,16 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 				checked[3] = true;
 				script_now = 8;
 				on_click = false;
-				setObjectImage(object_textbox, "resources/common/textbox.png");
 				scriptSetup("scene_7", scene[7], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
 			}
 		}
 
 	}
-	if (scene_num == 8 && on_click)
+	else if (scene_num == 8 && on_click)
 	{
 		if (object == object_surgerytool)
 		{
@@ -566,8 +717,11 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 				checked[0] = true;
 				script_now = 2;
 				on_click = false;
-				setObjectImage(object_textbox, "resources/common/textbox.png");
 				scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
 			}
 		}
 		else if (object == object_drawer)
@@ -580,8 +734,11 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 				checked[1] = true;
 				script_now = 3;
 				on_click = false;
-				setObjectImage(object_textbox, "resources/common/textbox.png");
 				scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
 			}
 		}
 		else if (object == object_wallet)
@@ -594,8 +751,134 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 				checked[2] = true;
 				script_now = 4;
 				on_click = false;
-				setObjectImage(object_textbox, "resources/common/textbox.png");
 				scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
+			}
+		}
+	}
+	else if (scene_num == 9 && on_click)
+	{
+		if (object == object_backpack)
+		{
+			if (checked[0] == false)
+			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
+				checked[0] = true;
+				script_now = 2;
+				on_click = false;
+				scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
+			}
+
+		}
+		else if (object == object_notebook)
+		{
+			if (checked[1] == false)
+			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
+				checked[1] = true;
+				script_now = 3;
+				on_click = false;
+				scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
+			}
+			else if (checked[2] == false)
+			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
+				checked[2] = true;
+				script_now = 4;
+				on_click = false;
+				scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
+			}
+		}
+		else if (object == object_notebookpad)
+		{
+			if (checked[3] == false)
+			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
+				checked[3] = true;
+				script_now = 5;
+				on_click = false;
+				scriptSetup("scene_9", scene[9], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
+			}
+		}
+	}
+	else if (scene_num == 10 && on_click)
+	{
+		if (object == object_bigbackpack)
+		{
+			if (checked[0] == false)
+			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
+				checked[0] = true;
+				script_now = 2;
+				on_click = false;
+				scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
+			}
+			else if (checked[1] == false)
+			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
+				checked[1] = true;
+				script_now = 3;
+				on_click = false;
+				scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
+			}
+
+		}
+		else if (object == object_note)
+		{
+			if (checked[2] == false)
+			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
+				checked[2] = true;
+				script_now = 4;
+				on_click = false;
+				scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
+			}
+			else if (checked[3] == false)
+			{
+				stopSound(sound_click);
+				playSound(sound_click);
+
+				checked[3] = true;
+				script_now = 5;
+				on_click = false;
+				scriptSetup("scene_10", scene[10], script_now, line_num[script_now], false);
+			}
+			else
+			{
+				selectedObject();
 			}
 		}
 	}
@@ -686,6 +969,7 @@ void nextScript(bool select)
 
 void scriptSetup(const char* scene_name, SceneID scene, int num, int line_num, bool select)
 {
+	setObjectImage(object_textbox, "resources/common/textbox.png");
 	if (select)
 	{
 		on_select = true;
@@ -774,20 +1058,12 @@ void sceneSetup(int n)
 		script_num = 5;
 		script_now = 1;
 
-		line_num[1] = 2;
-		line_num[2] = 3;
-		line_num[3] = 2;
-		line_num[4] = 3;
-		line_num[5] = 4;
-
+		line_num[1] = 2; line_num[2] = 3; line_num[3] = 2; line_num[4] = 3; line_num[5] = 4;
 
 		cnt = 1;
 
-		if (!on_load)
-		{
-			setTimer(timer_fadein, 0.2f);
-			startTimer(timer_fadein);
-		}
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
 
 		break;
 	case 3:
@@ -803,11 +1079,10 @@ void sceneSetup(int n)
 		line_num[1] = 4; line_num[2] = 3; line_num[3] = 3; line_num[4] = 4;
 
 		cnt = 1;
-		if (!on_load)
-		{
-			setTimer(timer_fadein, 0.2f);
-			startTimer(timer_fadein);
-		}
+
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
+
 		break;
 	case 4:
 		scene_num = 4;
@@ -825,11 +1100,10 @@ void sceneSetup(int n)
 
 
 		cnt = 1;
-		if (!on_load)
-		{
-			setTimer(timer_fadein, 0.2f);
-			startTimer(timer_fadein);
-		}
+
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
+
 		break;
 	case 5:
 		scene_num = 5;
@@ -846,11 +1120,10 @@ void sceneSetup(int n)
 		line_num[7] = 3; line_num[8] = 4; line_num[9] = 2;
 
 		cnt = 1;
-		if (!on_load)
-		{
-			setTimer(timer_fadein, 0.2f);
-			startTimer(timer_fadein);
-		}
+
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
+
 		break;
 	case 6:
 		scene_num = 6;
@@ -868,11 +1141,9 @@ void sceneSetup(int n)
 		line_num[1] = 2; line_num[2] = 2; line_num[3] = 2; line_num[4] = 3; line_num[5] = 3; line_num[6] = 4;
 		line_num[7] = 3; line_num[8] = 4;
 
-		if (!on_load)
-		{
-			setTimer(timer_fadein, 0.2f);
-			startTimer(timer_fadein);
-		}
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
+
 		cnt = 1;
 		break;
 	case 7:
@@ -907,13 +1178,11 @@ void sceneSetup(int n)
 		script_now = 1;
 
 		line_num[1] = 1; line_num[2] = 4; line_num[3] = 2; line_num[4] = 2; line_num[5] = 4; line_num[6] = 4;
-		line_num[7] = 4; line_num[8] = 3; line_num[9] = 3, line_num[10]=3;
+		line_num[7] = 4; line_num[8] = 3; line_num[9] = 3, line_num[10] = 3;
 
-		if (!on_load)
-		{
-			setTimer(timer_fadein, 0.2f);
-			startTimer(timer_fadein);
-		}
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
+
 		cnt = 1;
 		break;
 	case 8:
@@ -922,6 +1191,7 @@ void sceneSetup(int n)
 		setSceneLight(scene[8], 0);
 		enterScene(scene[8]);
 		scene_now = &scene[8];
+		char_now = &char_hansohyee;
 
 		for (int i = 0; i < 5; i++)
 		{
@@ -948,20 +1218,18 @@ void sceneSetup(int n)
 		line_num[7] = 2; line_num[8] = 2; line_num[9] = 2; line_num[10] = 2; line_num[11] = 2; line_num[12] = 2;
 		line_num[13] = 2; line_num[14] = 3; line_num[15] = 2; line_num[16] = 3; line_num[17] = 2; line_num[18] = 2; line_num[19] = 2;
 
-		if (!on_load)
-		{
-			setTimer(timer_fadein, 0.2f);
-			startTimer(timer_fadein);
-		}
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
+
 		cnt = 1;
 		break;
 	case 9:
-		//수정필요
 		scene_num = 9;
 		scene[9] = createScene("9", "resources/scene_9/background.jpg");
 		setSceneLight(scene[9], 0);
 		enterScene(scene[9]);
 		scene_now = &scene[9];
+		char_now = &char_leedohyeon;
 
 		for (int i = 0; i < 5; i++)
 		{
@@ -969,30 +1237,62 @@ void sceneSetup(int n)
 			selected[i] = false;
 		}
 
-		object_surgerytool = createObject("resources/scene_8/object_surgerytool.jpg");
-		locateObject(object_surgerytool, scene[8], 1000, 300);
-		showObject(object_surgerytool);
+		object_backpack = createObject("resources/scene_9/object_backback.png");
+		locateObject(object_backpack, scene[9], 650, 200);
+		showObject(object_backpack);
 
-		object_drawer = createObject("resources/scene_8/object_drawer.png");
-		locateObject(object_drawer, scene[8], 600, 200);
-		showObject(object_drawer);
+		object_notebook = createObject("resources/scene_9/object_notebook.png");
+		locateObject(object_notebook, scene[9], 200, 200);
+		showObject(object_notebook);
 
-		object_wallet = createObject("resources/scene_8/object_wallet.png");
-		locateObject(object_wallet, scene[8], 300, 200);
-		showObject(object_wallet);
+		object_notebookpad = createObject("resources/scene_9/object_notebookpad.png");
+		locateObject(object_notebookpad, scene[9], 1000, 300);
+		showObject(object_notebookpad);
 
-		script_num = 19;
+
+		script_num = 18;
 		script_now = 1;
 
-		line_num[1] = 1; line_num[2] = 3; line_num[3] = 3; line_num[4] = 3; line_num[5] = 3; line_num[6] = 4;
-		line_num[7] = 2; line_num[8] = 2; line_num[9] = 2; line_num[10] = 2; line_num[11] = 2; line_num[12] = 2;
-		line_num[13] = 2; line_num[14] = 3; line_num[15] = 2; line_num[16] = 3; line_num[17] = 2; line_num[18] = 2; line_num[19] = 2;
+		line_num[1] = 1; line_num[2] = 3; line_num[3] = 4; line_num[4] = 3; line_num[5] = 3; line_num[6] = 3;
+		line_num[7] = 4; line_num[8] = 2; line_num[9] = 2; line_num[10] = 2; line_num[11] = 2; line_num[12] = 2;
+		line_num[13] = 2; line_num[14] = 2; line_num[15] = 2; line_num[16] = 2; line_num[17] = 2; line_num[18] = 2;
 
-		if (!on_load)
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
+		cnt = 1;
+		break;
+	case 10:
+		scene_num = 10;
+		scene[10] = createScene("10", "resources/scene_10/background.jpg");
+		setSceneLight(scene[10], 0);
+		enterScene(scene[10]);
+		scene_now = &scene[10];
+		char_now = &char_kimyoonsuk;
+
+		for (int i = 0; i < 5; i++)
 		{
-			setTimer(timer_fadein, 0.2f);
-			startTimer(timer_fadein);
+			checked[i] = false;
+			selected[i] = false;
 		}
+
+		object_bigbackpack = createObject("resources/scene_10/object_bigbackback.png");
+		locateObject(object_bigbackpack, scene[10], 650, 200);
+		showObject(object_bigbackpack);
+
+		object_note = createObject("resources/scene_10/object_note.png");
+		locateObject(object_note, scene[10], 1000, 300);
+		showObject(object_note);
+
+		script_num = 22;
+		script_now = 1;
+
+		line_num[1] = 1; line_num[2] = 3; line_num[3] = 4; line_num[4] = 4; line_num[5] = 4; line_num[6] = 3;
+		line_num[7] = 4; line_num[8] = 2; line_num[9] = 2; line_num[10] = 2; line_num[11] = 3; line_num[12] = 2;
+		line_num[13] = 3; line_num[14] = 2; line_num[15] = 2; line_num[16] = 2; line_num[17] = 2; line_num[18] = 2;
+		line_num[19] = 2; line_num[20] = 2; line_num[21] = 3; line_num[22] = 2;
+
+		setTimer(timer_fadein, 0.2f);
+		startTimer(timer_fadein);
 		cnt = 1;
 		break;
 	default:
@@ -1069,7 +1369,6 @@ void loadGame()
 	}
 }
 
-
 bool judgeChecked(const char* scene_name, int objectnum, int scriptnum)
 {
 	int i = 0;
@@ -1103,7 +1402,15 @@ void setClick()
 	{
 		judged = judgeChecked(scene_name, 3, 5);
 	}
-	
+	else if (scene_num == 9)
+	{
+		judged = judgeChecked(scene_name, 4, 6);
+	}
+	else if (scene_num == 10)
+	{
+		judged = judgeChecked(scene_name, 4, 6);
+	}
+
 	if (judged == false)
 	{
 		on_click = true;
@@ -1132,6 +1439,7 @@ bool judgeSelected(const char* scene_name, int selectnum, int scriptnum)
 		script_now = scriptnum;
 		on_select = false;
 		scriptSetup(scene_name, scene[scene_num], script_now, line_num[script_now], false);
+		hideObject(*char_now);
 		return true;
 	}
 	else
@@ -1145,15 +1453,31 @@ void setSelect()
 	char scene_name[50];
 	sprintf_s(scene_name, sizeof(scene_name), "scene_%d", scene_num);
 	bool judged = false;
+
 	if (scene_num == 8)
 	{
 		judged = judgeSelected(scene_name, 4, 19);
+	}
+	else if (scene_num == 9)
+	{
+		judged = judgeSelected(scene_name, 4, 18);
+	}
+	else if (scene_num == 10)
+	{
+		judged = judgeSelected(scene_name, 4, 22);
 	}
 	if (judged == false)
 	{
 		on_select = true;
 		on_wait = false;
-		script_now = 6;
+
+		if (scene_num == 8)
+			script_now = 6;
+		else if (scene_num == 9)
+			script_now = 7;
+		else if (scene_num == 10)
+			script_now = 7;
+
 		for (int i = 1; i <= 4; i++)
 		{
 			hideObject(text[i]);
@@ -1164,9 +1488,34 @@ void setSelect()
 			if (selected[i] == true)
 			{
 				char buff[100];
-				sprintf_s(buff, sizeof(buff), "resources/scene_8/select6_line%d_selected.png", i);
+				if (scene_num == 8)
+				{
+					sprintf_s(buff, sizeof(buff), "resources/scene_8/select6_line%d_selected.png", i);
+				}
+				else if (scene_num == 9)
+				{
+					sprintf_s(buff, sizeof(buff), "resources/scene_9/select7_line%d_selected.png", i);
+				}
+				else if (scene_num == 10)
+				{
+					sprintf_s(buff, sizeof(buff), "resources/scene_10/select7_line%d_selected.png", i);
+				}
 				setObjectImage(text[i], buff);
 			}
 		}
 	}
+}
+
+void selectedObject()
+{
+	stopSound(sound_click);
+	playSound(sound_click);
+	script_now = -1;
+	for (int i = 1; i <= 4; i++)
+	{
+		hideObject(text[i]);
+	}
+	showObject(object_arrow);
+	setObject(text[3], "resources/common/text_selected.png", scene[scene_num], 100, LINE(4));
+	on_wait = true;
 }
