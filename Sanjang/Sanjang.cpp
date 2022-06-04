@@ -17,10 +17,11 @@ SceneID* scene_now;
 TimerID timer_start, timer_fadein, timer_fadeout, timer_saving;
 ObjectID object_arrow, object_start, object_textbox, save_text, object_title;
 ObjectID object_deadbody, object_namecard, object_carrier, object_knives;
-ObjectID object_surgerytool, object_drawer, object_wallet;
-ObjectID object_backpack, object_notebook, object_notebookpad;
-ObjectID object_bigbackpack, object_note;
+ObjectID object_surgerytool, object_drawer, object_wallet, object_knife, object_gloves;
+ObjectID object_backpack, object_notebook, object_notebookpad, object_card, object_gps, object_dadpicture;
+ObjectID object_bigbackpack, object_note, object_ring;
 ObjectID object_tool, object_file, object_note_detective;
+ObjectID object_picture[6];
 ObjectID text[5];
 ObjectID char_madongsuk, char_hansohyee, char_parkboyeong, char_leedohyeon, char_kimjongkuk, char_husungtae, char_kimyoonsuk;
 ObjectID* char_now;
@@ -98,6 +99,13 @@ int main()
 		text[i] = createObject("resources/common/text_idle.png");
 	}
 
+	for (int i = 1; i <= 5; i++)
+	{
+		char buff[50];
+		sprintf_s(buff, sizeof(buff), "resources/scene_%d/object_picture_%d.png", i + 7, i);
+		object_picture[i] = createObject(buff);
+	}
+
 	if (loadData() == 1)
 		return 1;
 
@@ -106,8 +114,6 @@ int main()
 	startGame(scene_main);
 
 }
-
-
 
 void timerCallback(TimerID timer)
 {
@@ -458,8 +464,6 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 					setClick();
 				}
 
-
-
 				else if (scene_num == 8 && script_now + 1 == 2)
 				{
 					stopSound(sound_click);
@@ -477,6 +481,10 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				}
 				else if (scene_num == 8 && (script_now == 2 || script_now == 3 || script_now == 4))
 				{
+					hideObject(object_knife);
+					hideObject(object_gloves);
+					hideObject(object_picture[1]);
+
 					stopSound(sound_click);
 					playSound(sound_click);
 
@@ -522,6 +530,11 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 				}
 				else if (scene_num == 9 && (script_now == 2 || script_now == 3 || script_now == 4 || script_now == 5))
 				{
+				hideObject(object_card);
+				hideObject(object_gps);
+				hideObject(object_dadpicture);
+				hideObject(object_picture[2]);
+
 					stopSound(sound_click);
 					playSound(sound_click);
 
@@ -831,6 +844,9 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 				stopSound(sound_click);
 				playSound(sound_click);
 
+				showObject(object_knife);
+				showObject(object_gloves);
+
 				checked[1] = true;
 				script_now = 3;
 				on_click = false;
@@ -848,9 +864,14 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 				stopSound(sound_click);
 				playSound(sound_click);
 
+				locateObject(object_picture[1], scene[8], 500, 300);
+				showObject(object_picture[1]);
+
 				checked[2] = true;
 				script_now = 4;
 				on_click = false;
+
+
 				scriptSetup("scene_8", scene[8], script_now, line_num[script_now], false);
 			}
 			else
@@ -886,6 +907,8 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 				stopSound(sound_click);
 				playSound(sound_click);
 
+				showObject(object_card);
+
 				checked[1] = true;
 				script_now = 3;
 				on_click = false;
@@ -895,6 +918,8 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 			{
 				stopSound(sound_click);
 				playSound(sound_click);
+				
+				showObject(object_gps);
 
 				checked[2] = true;
 				script_now = 4;
@@ -912,6 +937,9 @@ void mouseCallback(ObjectID object, int x, int y, MouseAction action)
 			{
 				stopSound(sound_click);
 				playSound(sound_click);
+
+				locateObject(object_picture[2], scene[9], 400, 300);
+				showObject(object_picture[2]);
 
 				checked[3] = true;
 				script_now = 5;
@@ -1139,7 +1167,6 @@ void nextScript(bool select)
 		on_select = false;
 		scriptSetup(buff, scene[scene_num], script_now, line_num[script_now]);
 	}
-
 }
 
 void scriptSetup(const char* scene_name, SceneID scene, int num, int line_num, bool select)
@@ -1386,6 +1413,13 @@ void sceneSetup(int n)
 		locateObject(object_wallet, scene[8], 300, 200);
 		showObject(object_wallet);
 
+		object_knife = createObject("resources/scene_8/object_knife.png");
+		locateObject(object_knife, scene[8], 300, 300);
+
+		object_gloves = createObject("resources/scene_8/object_gloves.png");
+		locateObject(object_gloves, scene[8], 600, 300);
+
+
 		script_num = 19;
 		script_now = 1;
 
@@ -1424,6 +1458,14 @@ void sceneSetup(int n)
 		locateObject(object_notebookpad, scene[9], 1000, 300);
 		showObject(object_notebookpad);
 
+		object_gps = createObject("resources/scene_9/object_gps.jpg");
+		locateObject(object_gps, scene[9], 360, 300);
+
+		object_card = createObject("resources/scene_9/object_card.jpg");
+		locateObject(object_card, scene[9], 360, 300);
+
+		object_dadpicture = createObject("resources/scene_9/object_dadpicture.jpg");
+		locateObject(object_dadpicture, scene[9], 700, 300);
 
 		script_num = 18;
 		script_now = 1;
@@ -1457,6 +1499,9 @@ void sceneSetup(int n)
 		object_note = createObject("resources/scene_10/object_note.png");
 		locateObject(object_note, scene[10], 1000, 300);
 		showObject(object_note);
+
+		object_ring = createObject("resources/scene_10/object_ring.jpg");
+		locateObject(object_ring, scene[10], 360, 300);
 
 		script_num = 22;
 		script_now = 1;
