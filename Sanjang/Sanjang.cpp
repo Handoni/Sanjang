@@ -360,7 +360,7 @@ void keyboardCallback(KeyCode keycode, KeyState keystate)
 							script_now = 53;
 							scriptSetup("scene_13", scene[13], script_now, line_num[script_now]);
 						}
-						else if (line_now == 2);
+						else if (line_now == 2)
 						{
 							on_select = false;
 							script_now = 60;
