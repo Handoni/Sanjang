@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sanjang", "Sanjang\Sanjang.vcxproj", "{8D6E9EB5-FE4E-4888-B81C-C4DF0F1891A8}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Sanjang_Install", "Sanjang_Install\Sanjang_Install.vdproj", "{0DC1A884-9A16-4A2F-BAA9-7A1146E0F339}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,10 @@ Global
 		{8D6E9EB5-FE4E-4888-B81C-C4DF0F1891A8}.Release|x64.Build.0 = Release|x64
 		{8D6E9EB5-FE4E-4888-B81C-C4DF0F1891A8}.Release|x86.ActiveCfg = Release|Win32
 		{8D6E9EB5-FE4E-4888-B81C-C4DF0F1891A8}.Release|x86.Build.0 = Release|Win32
+		{0DC1A884-9A16-4A2F-BAA9-7A1146E0F339}.Debug|x64.ActiveCfg = Debug
+		{0DC1A884-9A16-4A2F-BAA9-7A1146E0F339}.Debug|x86.ActiveCfg = Debug
+		{0DC1A884-9A16-4A2F-BAA9-7A1146E0F339}.Release|x64.ActiveCfg = Release
+		{0DC1A884-9A16-4A2F-BAA9-7A1146E0F339}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
